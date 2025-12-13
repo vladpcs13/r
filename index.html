@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Картинка + звук</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        margin: 0;
+        background: #000;
+        color: white;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+    }
+    .panel {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 90%;
+        max-width: 400px;
+    }
+    input, button {
+        padding: 10px;
+        font-size: 16px;
+    }
+    img {
+        max-width: 100%;
+        max-height: 90vh;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<div id="creator" class="panel">
+    <h2>Создать ссылку</h2>
+    <input type="file" id="img" accept="image/*">
+    <input type="file" id="snd" accept="audio/*">
+    <button onclick="createLink()">Создать ссылку</button>
+    <input id="link" readonly>
+</div>
+
+<div id="viewer" style="display:none">
+    <img id="image">
+    <audio id="audio"></audio>
+</div>
+
+<script>
+function toBase64(file) {
+    return new Promise(res => {
+        const r = new FileReader();
+        r.onload = () => res(r.result);
+        r.readAsDataURL(file);
+    });
+}
+
+async function createLink() {
+    const img = document.getElementById('img').files[0];
+    const snd = document.getElementById('snd').files[0];
+    if (!img || !snd) {
+        alert("Выбери картинку и звук");
+        return;
+    }
+
+    const img64 = await toBase64(img);
+    const snd64 = await toBase64(snd);
+
+    const data = btoa(JSON.stringify({ img: img64, snd: snd64 }));
+    const url = location.origin + location.pathname + "#data=" + data;
+
+    document.getElementById("link").value = url;
+}
+
+// ====== ПРОСМОТР ПО ССЫЛКЕ ======
+if (location.hash.startsWith("#data=")) {
+    document.getElementById("creator").style.display = "none";
+    document.getElementById("viewer").style.display = "block";
+
+    const json = JSON.parse(atob(location.hash.slice(6)));
+    const image = document.getElementById("image");
+    const audio = document.getElementById("audio");
+
+    image.src = json.img;
+    audio.src = json.snd;
+
+    image.onclick = () => {
+        audio.currentTime = 0;
+        audio.play();
+    };
+}
+</script>
+
+</body>
+</html>
