@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Нажмите чтобы закрыть</title>
+  <title>Установка вирусов</title>
   <style>
     html, body {
       margin: 0;
@@ -12,41 +12,65 @@
       overflow: hidden;
       background: black;
       font-family: Arial, sans-serif;
+      user-select: none;
     }
 
     #container {
       width: 100%;
       height: 100%;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       cursor: pointer;
       color: white;
-      font-size: 5vw;
+      font-size: 4vw;
       transition: background 0.5s ease;
       position: relative;
+      background: black;
+      gap: 3vh;
     }
 
-    #text {
-      z-index: 2;
+    #title {
+      font-size: 5vw;
+      text-align: center;
+    }
+
+    #stopBtn {
+      font-size: 3vw;
+      padding: 1.2vw 4vw;
+      border: none;
+      border-radius: 1vw;
+      background: red;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #stopBtn:hover {
+      background: rgb(200, 0, 0);
+      transform: scale(1.05);
     }
 
     #gif {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
       display: none;
       opacity: 0;
       transition: opacity 0.5s ease;
+      background: white;
     }
   </style>
 </head>
 <body>
   <div id="container">
-    <div id="text">НАЖМИТЕ ЧТОБЫ ЗАКРЫТЬ</div>
+    <div id="title">УСТАНОВКА ВИРУСОВ...</div>
+    <button id="stopBtn">Остановить</button>
     <img id="gif" src="gif.gif">
   </div>
 
@@ -54,39 +78,40 @@
     let started = false;
     let audio;
 
-    async function start() {
+    async function startFull() {
       if (started) return;
       started = true;
 
       const container = document.getElementById('container');
-      const text = document.getElementById('text');
+      const title = document.getElementById('title');
+      const stopBtn = document.getElementById('stopBtn');
       const gif = document.getElementById('gif');
 
-      // Пытаемся fullscreen через контейнер
+
       if (container.requestFullscreen) {
         try { await container.requestFullscreen(); } catch(e) {}
       }
 
-      // Фон плавно меняем на белый
+
       container.style.background = "white";
+      document.body.style.background = "white";
 
-      // Скрываем текст
-      text.style.display = "none";
 
-      // Показываем GIF
+      title.style.display = "none";
+      stopBtn.style.display = "none";
+
+
       gif.style.display = "block";
-      requestAnimationFrame(() => {
-        gif.style.opacity = "1";
-      });
+      requestAnimationFrame(() => gif.style.opacity = "1");
 
-      // Создаем и запускаем аудио
+
       audio = new Audio('snd.mp3');
       audio.loop = true;
-      audio.play().catch(err => console.log("Ошибка воспроизведения звука:", err));
+      audio.play().catch(() => {});
     }
 
-    document.addEventListener("click", start);
-    document.addEventListener("touchend", start);
+    document.addEventListener("click", startFull);
+    document.addEventListener("touchend", startFull);
   </script>
 </body>
 </html>
